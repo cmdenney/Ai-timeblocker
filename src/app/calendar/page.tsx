@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { AuthService } from '@/lib/supabase/auth'
+import { CalendarService } from '@/lib/supabase/services/calendar'
 import { useRouter } from 'next/navigation'
 import { Calendar } from '@/components/calendar/Calendar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, Calendar as CalendarIcon } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Plus, Calendar as CalendarIcon, RefreshCw, CheckCircle } from 'lucide-react'
 
 interface CalendarEvent {
   id: string
@@ -22,16 +24,30 @@ interface CalendarEvent {
 export default function CalendarPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isGoogleConnected, setIsGoogleConnected] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
+  const [syncMessage, setSyncMessage] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const user = await AuthService.getCurrentUser()
+        setCurrentUser(user)
         setIsAuthenticated(!!user)
+        
         if (!user) {
           router.push('/auth/signin')
+          return
         }
+
+        // Check if Google Calendar is connected
+        const isConnected = await CalendarService.isGoogleCalendarConnected(user.id)
+        setIsGoogleConnected(isConnected)
+
+        // Load events
+        await loadEvents(user.id)
       } catch (error) {
         console.error('Auth check failed:', error)
         router.push('/auth/signin')
@@ -42,35 +58,61 @@ export default function CalendarPage() {
     checkAuth()
   }, [router])
 
-  const [events, setEvents] = useState<CalendarEvent[]>([
-    {
-      id: '1',
-      title: 'Team Meeting',
-      startTime: new Date(2024, 11, 15, 10, 0),
-      endTime: new Date(2024, 11, 15, 11, 0),
-      isAllDay: false,
-      category: 'meeting',
-      description: 'Weekly team standup',
-      location: 'Conference Room A'
-    },
-    {
-      id: '2',
-      title: 'Focus Time',
-      startTime: new Date(2024, 11, 16, 14, 0),
-      endTime: new Date(2024, 11, 16, 16, 0),
-      isAllDay: false,
-      category: 'focus',
-      description: 'Deep work session'
-    },
-    {
-      id: '3',
-      title: 'Lunch Break',
-      startTime: new Date(2024, 11, 17, 12, 0),
-      endTime: new Date(2024, 11, 17, 13, 0),
-      isAllDay: false,
-      category: 'break'
+  const loadEvents = async (userId: string) => {
+    try {
+      const userEvents = await CalendarService.getUserEvents(userId)
+      setEvents(userEvents.map(event => ({
+        id: event.id,
+        title: event.title,
+        startTime: new Date(event.start_time),
+        endTime: new Date(event.end_time),
+        isAllDay: event.is_all_day || false,
+        description: event.description,
+        location: event.location,
+        category: event.category as any
+      })))
+    } catch (error) {
+      console.error('Failed to load events:', error)
     }
-  ])
+  }
+
+  const syncWithGoogle = async () => {
+    if (!currentUser) return
+
+    try {
+      setIsSyncing(true)
+      setSyncMessage('Syncing with Google Calendar...')
+      
+      const googleEvents = await CalendarService.syncGoogleEvents(currentUser.id)
+      
+      // Convert Google events to our format and save them
+      for (const event of googleEvents) {
+        await CalendarService.saveEvent(currentUser.id, {
+          title: event.title,
+          description: event.description,
+          start_time: event.startTime,
+          end_time: event.endTime,
+          location: event.location,
+          category: 'google',
+          google_event_id: event.id
+        })
+      }
+
+      // Reload events
+      await loadEvents(currentUser.id)
+      
+      setSyncMessage(`Successfully synced ${googleEvents.length} events from Google Calendar!`)
+      setTimeout(() => setSyncMessage(null), 3000)
+    } catch (error) {
+      console.error('Failed to sync with Google:', error)
+      setSyncMessage('Failed to sync with Google Calendar. Please try again.')
+      setTimeout(() => setSyncMessage(null), 5000)
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
+  const [events, setEvents] = useState<CalendarEvent[]>([])
 
   const handleEventClick = (event: CalendarEvent) => {
     console.log('Event clicked:', event)
@@ -117,11 +159,46 @@ export default function CalendarPage() {
               Manage your schedule and time blocks
             </p>
           </div>
-          <Button className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Add Event
-          </Button>
+          <div className="flex items-center gap-2">
+            {isGoogleConnected && (
+              <Button 
+                onClick={syncWithGoogle} 
+                disabled={isSyncing}
+                variant="outline"
+              >
+                <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                {isSyncing ? 'Syncing...' : 'Sync Google'}
+              </Button>
+            )}
+            <Button onClick={() => handleAddEvent(new Date())}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Event
+            </Button>
+          </div>
         </div>
+
+        {/* Google Calendar Status */}
+        {isGoogleConnected ? (
+          <Alert>
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription>
+              Google Calendar is connected! Your events will sync automatically.
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <Alert variant="destructive">
+            <AlertDescription>
+              Google Calendar is not connected. Sign in with Google to sync your calendar.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Sync Message */}
+        {syncMessage && (
+          <Alert>
+            <AlertDescription>{syncMessage}</AlertDescription>
+          </Alert>
+        )}
 
         {/* Calendar */}
         <Calendar

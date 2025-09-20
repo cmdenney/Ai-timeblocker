@@ -38,6 +38,16 @@ export default function AuthCallbackPage() {
             email: session.user.email || '',
             user_metadata: session.user.user_metadata,
           })
+
+          // Store Google OAuth tokens if available
+          if (session.provider_token) {
+            await UserService.updateUser(session.user.id, {
+              google_access_token: session.provider_token,
+              google_refresh_token: session.provider_refresh_token || null,
+              google_calendar_enabled: true
+            })
+            console.log('Google OAuth tokens stored successfully')
+          }
         } catch (profileError) {
           console.error('Failed to create user profile:', profileError)
           // Don't throw here, just log the error
