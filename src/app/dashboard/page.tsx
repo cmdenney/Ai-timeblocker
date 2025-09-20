@@ -1,11 +1,47 @@
-import { Suspense } from 'react'
-import { getCurrentUser } from '@/lib/auth'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { SignOutButton } from '@/components/auth/sign-out-button'
-import { Skeleton } from '@/components/ui/skeleton'
+'use client'
 
-async function DashboardContent() {
-  const user = await getCurrentUser()
+import { useEffect, useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { AuthService } from '@/lib/supabase/auth'
+import { useRouter } from 'next/navigation'
+
+export default function DashboardPage() {
+  const [user, setUser] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const currentUser = await AuthService.getCurrentUser()
+        setUser(currentUser)
+        if (!currentUser) {
+          router.push('/auth/signin')
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+        router.push('/auth/signin')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    checkAuth()
+  }, [router])
+
+  const handleSignOut = async () => {
+    try {
+      await AuthService.signOut()
+      router.push('/')
+    } catch (error) {
+      console.error('Sign out failed:', error)
+    }
+  }
+
+  if (isLoading) {
+    return <DashboardSkeleton />
+  }
 
   if (!user) {
     return (
@@ -31,7 +67,9 @@ async function DashboardContent() {
                 Welcome back, {user.profile?.full_name || user.email}! Here&apos;s your productivity overview.
           </p>
         </div>
-        <SignOutButton user={user} />
+        <Button onClick={handleSignOut} variant="outline">
+          Sign Out
+        </Button>
       </div>
 
       <div className="space-y-6">
@@ -159,7 +197,7 @@ function DashboardSkeleton() {
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-96 mt-2" />
         </div>
-        <Skeleton className="h-8 w-8 rounded-full" />
+        <Skeleton className="h-8 w-20" />
       </div>
       
       <div className="space-y-6">
@@ -178,13 +216,5 @@ function DashboardSkeleton() {
         </div>
       </div>
     </div>
-  )
-}
-
-export default function DashboardPage() {
-  return (
-    <Suspense fallback={<DashboardSkeleton />}>
-      <DashboardContent />
-    </Suspense>
   )
 }

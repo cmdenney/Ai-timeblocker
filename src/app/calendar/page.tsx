@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { AuthService } from '@/lib/supabase/auth'
+import { useRouter } from 'next/navigation'
 import { Calendar } from '@/components/calendar/Calendar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +20,28 @@ interface CalendarEvent {
 }
 
 export default function CalendarPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const user = await AuthService.getCurrentUser()
+        setIsAuthenticated(!!user)
+        if (!user) {
+          router.push('/auth/signin')
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+        router.push('/auth/signin')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    checkAuth()
+  }, [router])
+
   const [events, setEvents] = useState<CalendarEvent[]>([
     {
       id: '1',
@@ -61,6 +85,22 @@ export default function CalendarPage() {
   const handleAddEvent = (date: Date) => {
     console.log('Add event for date:', date)
     // TODO: Open add event modal
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="text-center">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="text-center">Access Denied. Please sign in.</div>
+      </div>
+    )
   }
 
   return (

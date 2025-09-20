@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { AuthService } from '@/lib/supabase/auth'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -14,6 +16,28 @@ interface ChatMessage {
 }
 
 export default function ChatPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const user = await AuthService.getCurrentUser()
+        setIsAuthenticated(!!user)
+        if (!user) {
+          router.push('/auth/signin')
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+        router.push('/auth/signin')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    checkAuth()
+  }, [router])
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -23,7 +47,7 @@ export default function ChatPage() {
     }
   ])
   const [input, setInput] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isSending, setIsSending] = useState(false)
 
   const handleSend = async () => {
     if (!input.trim()) return
@@ -37,7 +61,7 @@ export default function ChatPage() {
 
     setMessages(prev => [...prev, userMessage])
     setInput('')
-    setIsLoading(true)
+    setIsSending(true)
 
     // Simulate AI response
     setTimeout(() => {
@@ -48,7 +72,7 @@ export default function ChatPage() {
         timestamp: new Date()
       }
       setMessages(prev => [...prev, aiMessage])
-      setIsLoading(false)
+      setIsSending(false)
     }, 1000)
   }
 
@@ -57,6 +81,22 @@ export default function ChatPage() {
       e.preventDefault()
       handleSend()
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8 px-4 max-w-4xl">
+        <div className="text-center">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto py-8 px-4 max-w-4xl">
+        <div className="text-center">Access Denied. Please sign in.</div>
+      </div>
+    )
   }
 
   return (
@@ -99,7 +139,7 @@ export default function ChatPage() {
                   </div>
                 </div>
               ))}
-              {isLoading && (
+              {isSending && (
                 <div className="flex justify-start">
                   <div className="bg-muted rounded-lg p-3">
                     <div className="flex items-center gap-2">
@@ -119,9 +159,9 @@ export default function ChatPage() {
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message here... (e.g., 'Schedule a meeting tomorrow at 2pm')"
                 className="flex-1"
-                disabled={isLoading}
+                disabled={isSending}
               />
-              <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
+              <Button onClick={handleSend} disabled={isSending || !input.trim()}>
                 <Send className="h-4 w-4" />
               </Button>
             </div>
