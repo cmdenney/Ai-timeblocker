@@ -147,7 +147,7 @@
 
 @layer base {
   * {
-    @apply border-border/20;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
