@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser } from '@/lib/auth'
-import { updateUser } from '@/lib/db-operations'
+import { AuthService } from '@/lib/supabase/auth'
+import { UserService } from '@/lib/supabase/services/users'
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const currentUser = await getCurrentUser()
+    const currentUser = await AuthService.getCurrentUser()
     
     if (!currentUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -19,9 +19,14 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { name } = body
+    const { full_name, timezone, working_hours, preferences } = body
 
-    const updatedUser = await updateUser(id, { name })
+    const updatedUser = await UserService.updateUser(id, {
+      full_name,
+      timezone,
+      working_hours,
+      preferences,
+    })
 
     return NextResponse.json({ user: updatedUser })
   } catch (error) {

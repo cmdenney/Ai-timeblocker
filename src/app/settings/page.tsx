@@ -1,195 +1,179 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+'use client'
+
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { Separator } from '@/components/ui/separator'
+import { Calendar, User, Bell, Palette } from 'lucide-react'
 
 export default function SettingsPage() {
+  const [notifications, setNotifications] = useState(true)
+  const [emailReminders, setEmailReminders] = useState(true)
+  const [theme, setTheme] = useState('light')
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <h1 className="text-3xl font-bold">Settings</h1>
           <p className="text-muted-foreground">
-            Manage your preferences and account settings.
+            Manage your AI Timeblocker preferences and account settings.
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6">
+          {/* Profile Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>General Preferences</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Profile
+              </CardTitle>
               <CardDescription>
-                Basic settings for your time blocking experience
+                Manage your personal information and preferences.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Timezone</label>
-                <select className="w-full p-2 border rounded-md">
-                  <option>UTC-8 (Pacific Time)</option>
-                  <option>UTC-5 (Eastern Time)</option>
-                  <option>UTC+0 (GMT)</option>
-                  <option>UTC+1 (Central European Time)</option>
-                </select>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Working Hours</label>
-                <div className="flex space-x-2">
-                  <input 
-                    type="time" 
-                    defaultValue="09:00" 
-                    className="flex-1 p-2 border rounded-md"
-                  />
-                  <span className="flex items-center">to</span>
-                  <input 
-                    type="time" 
-                    defaultValue="17:00" 
-                    className="flex-1 p-2 border rounded-md"
-                  />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input id="name" placeholder="Enter your full name" />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="Enter your email" />
                 </div>
               </div>
+              <div>
+                <Label htmlFor="timezone">Timezone</Label>
+                <Input id="timezone" placeholder="UTC" />
+              </div>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Break Duration (minutes)</label>
-                <input 
-                  type="number" 
-                  defaultValue="15" 
-                  min="5" 
-                  max="60" 
-                  className="w-full p-2 border rounded-md"
+          {/* Calendar Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Calendar Integration
+              </CardTitle>
+              <CardDescription>
+                Connect and manage your calendar integrations.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Google Calendar</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Sync events with your Google Calendar
+                  </p>
+                </div>
+                <Button variant="outline">Connect</Button>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Working Hours</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Set your default working hours
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Input type="time" className="w-24" defaultValue="09:00" />
+                  <span>to</span>
+                  <Input type="time" className="w-24" defaultValue="17:00" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Notification Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Notifications
+              </CardTitle>
+              <CardDescription>
+                Configure how you receive notifications.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Push Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive notifications for upcoming events
+                  </p>
+                </div>
+                <Switch
+                  checked={notifications}
+                  onCheckedChange={setNotifications}
                 />
               </div>
-
-              <Button>Save Preferences</Button>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Email Reminders</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Get email reminders for important events
+                  </p>
+                </div>
+                <Switch
+                  checked={emailReminders}
+                  onCheckedChange={setEmailReminders}
+                />
+              </div>
             </CardContent>
           </Card>
 
+          {/* Appearance Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>Calendar Integration</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Appearance
+              </CardTitle>
               <CardDescription>
-                Connect your external calendars
+                Customize the look and feel of your interface.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded"></div>
-                  <div>
-                    <p className="font-medium">Google Calendar</p>
-                    <p className="text-sm text-muted-foreground">Not connected</p>
-                  </div>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Theme</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Choose your preferred theme
+                  </p>
                 </div>
-                <Button variant="outline" size="sm">Connect</Button>
-              </div>
-
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded"></div>
-                  <div>
-                    <p className="font-medium">Microsoft Outlook</p>
-                    <p className="text-sm text-muted-foreground">Not connected</p>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={theme === 'light' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setTheme('light')}
+                  >
+                    Light
+                  </Button>
+                  <Button
+                    variant={theme === 'dark' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setTheme('dark')}
+                  >
+                    Dark
+                  </Button>
                 </div>
-                <Button variant="outline" size="sm">Connect</Button>
-              </div>
-
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gray-500 rounded"></div>
-                  <div>
-                    <p className="font-medium">Apple Calendar</p>
-                    <p className="text-sm text-muted-foreground">Not connected</p>
-                  </div>
-                </div>
-                <Button variant="outline" size="sm">Connect</Button>
               </div>
             </CardContent>
           </Card>
+        </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Notifications</CardTitle>
-              <CardDescription>
-                Configure how you receive notifications
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Email Notifications</p>
-                  <p className="text-sm text-muted-foreground">Receive updates via email</p>
-                </div>
-                <input type="checkbox" defaultChecked className="w-4 h-4" />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Push Notifications</p>
-                  <p className="text-sm text-muted-foreground">Browser notifications</p>
-                </div>
-                <input type="checkbox" defaultChecked className="w-4 h-4" />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Break Reminders</p>
-                  <p className="text-sm text-muted-foreground">Remind me to take breaks</p>
-                </div>
-                <input type="checkbox" defaultChecked className="w-4 h-4" />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Meeting Alerts</p>
-                  <p className="text-sm text-muted-foreground">Alert before meetings</p>
-                </div>
-                <input type="checkbox" defaultChecked className="w-4 h-4" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>AI Preferences</CardTitle>
-              <CardDescription>
-                Customize AI behavior and insights
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">AI Optimization Level</label>
-                <select className="w-full p-2 border rounded-md">
-                  <option>Conservative</option>
-                  <option>Balanced</option>
-                  <option>Aggressive</option>
-                </select>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Auto-schedule Breaks</p>
-                  <p className="text-sm text-muted-foreground">Let AI schedule your breaks</p>
-                </div>
-                <input type="checkbox" className="w-4 h-4" />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Energy-based Scheduling</p>
-                  <p className="text-sm text-muted-foreground">Schedule based on energy levels</p>
-                </div>
-                <input type="checkbox" defaultChecked className="w-4 h-4" />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Conflict Resolution</p>
-                  <p className="text-sm text-muted-foreground">Auto-resolve scheduling conflicts</p>
-                </div>
-                <input type="checkbox" className="w-4 h-4" />
-              </div>
-            </CardContent>
-          </Card>
+        {/* Save Button */}
+        <div className="flex justify-end">
+          <Button size="lg">Save Changes</Button>
         </div>
       </div>
     </div>

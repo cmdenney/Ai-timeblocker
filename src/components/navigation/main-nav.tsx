@@ -8,9 +8,7 @@ import { SignOutButton } from '@/components/auth/sign-out-button'
 import { cn } from '@/lib/utils'
 import { 
   Calendar, 
-  BarChart3, 
   Settings, 
-  User, 
   Home,
   MessageSquare
 } from 'lucide-react'
@@ -18,7 +16,6 @@ import {
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Calendar', href: '/calendar', icon: Calendar },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Chat', href: '/chat', icon: MessageSquare },
   { name: 'Settings', href: '/settings', icon: Settings },
 ]
