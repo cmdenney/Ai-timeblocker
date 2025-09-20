@@ -38,10 +38,14 @@ export default function SignUpPage() {
       setIsLoading(true)
       setError(null)
       
-      await AuthService.signInWithProvider(provider)
+      console.log(`Starting ${provider} OAuth sign-in...`)
+      const result = await AuthService.signInWithProvider(provider)
+      console.log('OAuth result:', result)
+      
       // OAuth will redirect, so no need to navigate manually
     } catch (error: any) {
-      setError(error.message || 'Failed to sign in. Please try again.')
+      console.error(`${provider} OAuth error:`, error)
+      setError(error.message || `Failed to sign in with ${provider}. Please try again.`)
       setIsLoading(false)
     }
   }

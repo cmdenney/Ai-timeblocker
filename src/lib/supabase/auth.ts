@@ -149,7 +149,13 @@ export class AuthService {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: `${window.location.origin}/auth/callback`,
+        scopes: provider === 'google' 
+          ? 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'
+          : undefined,
+        queryParams: provider === 'google' 
+          ? { access_type: 'offline', prompt: 'consent' }
+          : undefined
       }
     })
 
