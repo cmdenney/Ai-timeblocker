@@ -1,7 +1,38 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { useEffect } from 'react'
 
 export default function HomePage() {
+  const router = useRouter()
+  const { data: session, status } = useSession()
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/dashboard')
+    }
+  }, [status, router])
+
+  const handleGetStarted = () => {
+    if (session) {
+      router.push('/dashboard')
+    } else {
+      router.push('/auth/signin')
+    }
+  }
+
+  const handleLearnMore = () => {
+    // Scroll to features section or navigate to about page
+    const featuresSection = document.getElementById('features')
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-8">
@@ -16,15 +47,15 @@ export default function HomePage() {
         </div>
 
         <div className="flex gap-4">
-          <Button size="lg" className="px-8">
-            Get Started
+          <Button size="lg" className="px-8" onClick={handleGetStarted}>
+            {session ? 'Go to Dashboard' : 'Get Started'}
           </Button>
-          <Button variant="outline" size="lg" className="px-8">
+          <Button variant="outline" size="lg" className="px-8" onClick={handleLearnMore}>
             Learn More
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mt-12">
+        <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mt-12">
           <Card>
             <CardHeader>
               <CardTitle>Smart Scheduling</CardTitle>
@@ -57,15 +88,15 @@ export default function HomePage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Analytics & Insights</CardTitle>
+              <CardTitle>AI Chat Assistant</CardTitle>
               <CardDescription>
-                Track your productivity patterns and get actionable insights.
+                Natural language interface for scheduling and time management.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Understand how you spend your time and identify opportunities 
-                for improvement with detailed analytics.
+                Simply tell the AI what you need to schedule and it will 
+                automatically create time blocks and calendar events.
               </p>
             </CardContent>
           </Card>
