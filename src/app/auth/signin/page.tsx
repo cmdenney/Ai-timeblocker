@@ -44,7 +44,13 @@ export default function SignInPage() {
       // OAuth will redirect, so no need to navigate manually
     } catch (error: any) {
       console.error(`${provider} OAuth error:`, error)
-      setError(error.message || `Failed to sign in with ${provider}. Please try again.`)
+      
+      // Check if it's a provider not enabled error
+      if (error.message?.includes('provider is not enabled')) {
+        setError(`${provider} OAuth is not configured yet. Please use email sign-in or contact support.`)
+      } else {
+        setError(error.message || `Failed to sign in with ${provider}. Please try again.`)
+      }
       setIsLoading(false)
     }
   }
