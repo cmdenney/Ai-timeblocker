@@ -58,7 +58,7 @@ export const chatMessageVariants = cva(
 
 // Calendar Cell Variants
 export const calendarCellVariants = cva(
-  'calendar-cell w-calendar-cell h-calendar-cell aspect-calendar-cell rounded-calendar-cell border border-border bg-card transition-colors duration-200',
+  'calendar-cell w-10 h-10 aspect-square rounded-md border border-border bg-card transition-colors duration-200',
   {
     variants: {
       state: {

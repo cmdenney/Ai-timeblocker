@@ -6,27 +6,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Github, Mail, Calendar } from 'lucide-react'
+import { Github, Mail } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { AuthService } from '@/lib/supabase/auth'
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState('')
   const router = useRouter()
 
-  const handleEmailSignIn = async (e: React.FormEvent) => {
+  const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       setIsLoading(true)
       setError(null)
       
-      await AuthService.signInWithEmail(email, password)
+      await AuthService.signUpWithEmail(email, password, { full_name: fullName })
       router.push('/dashboard')
     } catch (error: any) {
-      setError(error.message || 'Failed to sign in. Please try again.')
+      setError(error.message || 'Failed to create account. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -49,9 +50,9 @@ export default function SignInPage() {
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Welcome to AI TimeBlocker</CardTitle>
+          <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
           <CardDescription>
-            Sign in to your account to get started with intelligent time management
+            Sign up to start using AI TimeBlocker
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -95,7 +96,18 @@ export default function SignInPage() {
             </div>
           </div>
 
-          <form onSubmit={handleEmailSignIn} className="space-y-4">
+          <form onSubmit={handleEmailSignUp} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                type="text"
+                placeholder="Enter your full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -112,22 +124,23 @@ export default function SignInPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Create a password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? 'Creating account...' : 'Create Account'}
             </Button>
           </form>
 
           <div className="text-center text-sm text-muted-foreground">
             <p>
-              New to AI TimeBlocker?{' '}
-              <a href="/auth/signup" className="underline underline-offset-4 hover:text-primary">
-                Create an account
+              Already have an account?{' '}
+              <a href="/auth/signin" className="underline underline-offset-4 hover:text-primary">
+                Sign in
               </a>
             </p>
           </div>

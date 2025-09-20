@@ -3,22 +3,34 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
-import { useEffect } from 'react'
+import { AuthService } from '@/lib/supabase/auth'
+import { useEffect, useState } from 'react'
 
 export default function HomePage() {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Redirect authenticated users to dashboard
+  // Check authentication status
   useEffect(() => {
-    if (status === 'authenticated') {
-      router.push('/dashboard')
+    const checkAuth = async () => {
+      try {
+        const user = await AuthService.getCurrentUser()
+        setIsAuthenticated(!!user)
+        if (user) {
+          router.push('/dashboard')
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
-  }, [status, router])
+    checkAuth()
+  }, [router])
 
   const handleGetStarted = () => {
-    if (session) {
+    if (isAuthenticated) {
       router.push('/dashboard')
     } else {
       router.push('/auth/signin')
@@ -47,8 +59,8 @@ export default function HomePage() {
         </div>
 
         <div className="flex gap-4">
-          <Button size="lg" className="px-8" onClick={handleGetStarted}>
-            {session ? 'Go to Dashboard' : 'Get Started'}
+          <Button size="lg" className="px-8" onClick={handleGetStarted} disabled={isLoading}>
+            {isLoading ? 'Loading...' : isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
           </Button>
           <Button variant="outline" size="lg" className="px-8" onClick={handleLearnMore}>
             Learn More
