@@ -2,19 +2,12 @@
 const nextConfig = {
   // Enable experimental features
   experimental: {
-    // Remove deprecated turbo config
-    // turbo: {
-    //   rules: {
-    //     '*.svg': {
-    //       loaders: ['@svgr/webpack'],
-    //       as: '*.js',
-    //     },
-    //   },
-    // },
+    // Add any experimental features here
   },
 
   // Turbopack configuration (replaces experimental.turbo)
   turbopack: {
+    root: process.cwd(),
     rules: {
       '*.svg': {
         loaders: ['@svgr/webpack'],

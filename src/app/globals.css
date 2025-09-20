@@ -147,17 +147,18 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
 
 @layer components {
   /* Calendar cell styling */
   .calendar-cell {
-    @apply w-calendar-cell h-calendar-cell aspect-calendar-cell rounded-calendar-cell border border-border bg-card hover:bg-accent transition-colors duration-200;
+    @apply w-10 h-10 aspect-square rounded-md border border-border bg-card hover:bg-accent transition-colors duration-200;
   }
   
   .calendar-cell-today {
@@ -202,7 +203,7 @@
   
   /* Chat message bubbles */
   .chat-bubble {
-    @apply max-w-xs lg:max-w-md px-chat-bubble py-2 rounded-chat-bubble text-chat-sm;
+    @apply max-w-xs lg:max-w-md px-3 py-2 rounded-lg text-sm;
   }
   
   .chat-bubble-user {
@@ -218,7 +219,7 @@
   }
   
   .chat-container {
-    @apply flex flex-col gap-chat-gap p-4;
+    @apply flex flex-col gap-2 p-4;
   }
   
   .chat-message {
@@ -256,15 +257,15 @@
   
   /* Calendar grid */
   .calendar-grid {
-    @apply grid grid-cols-calendar gap-calendar-gap;
+    @apply grid grid-cols-7 gap-1;
   }
   
   .calendar-grid-mobile {
-    @apply grid grid-cols-calendar-mobile gap-2;
+    @apply grid grid-cols-1 gap-2;
   }
   
   .calendar-header {
-    @apply grid grid-cols-calendar gap-calendar-gap mb-2;
+    @apply grid grid-cols-7 gap-1 mb-2;
   }
   
   .calendar-header-cell {

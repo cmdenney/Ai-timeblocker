@@ -79,18 +79,20 @@ export const createMockRequest = (options: {
 // Test environment setup
 export const setupTestEnvironment = () => {
   // Mock environment variables
-  process.env.NODE_ENV = 'test'
-  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
-  process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key'
-  process.env.NEXTAUTH_SECRET = 'test-secret-key-for-testing-only'
-  process.env.NEXTAUTH_URL = 'http://localhost:3000'
-  process.env.OPENAI_API_KEY = 'test-openai-key'
-  process.env.GOOGLE_CLIENT_ID = 'test-google-client-id'
-  process.env.GOOGLE_CLIENT_SECRET = 'test-google-client-secret'
-  process.env.GITHUB_CLIENT_ID = 'test-github-client-id'
-  process.env.GITHUB_CLIENT_SECRET = 'test-github-client-secret'
-  process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000'
+  Object.assign(process.env, {
+    NODE_ENV: 'test',
+    NEXT_PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
+    SUPABASE_SERVICE_ROLE_KEY: 'test-service-key',
+    NEXTAUTH_SECRET: 'test-secret-key-for-testing-only',
+    NEXTAUTH_URL: 'http://localhost:3000',
+    OPENAI_API_KEY: 'test-openai-key',
+    GOOGLE_CLIENT_ID: 'test-google-client-id',
+    GOOGLE_CLIENT_SECRET: 'test-google-client-secret',
+    GITHUB_CLIENT_ID: 'test-github-client-id',
+    GITHUB_CLIENT_SECRET: 'test-github-client-secret',
+    NEXT_PUBLIC_BASE_URL: 'http://localhost:3000'
+  })
 }
 
 // Test scenarios
@@ -245,19 +247,19 @@ export const performanceUtils = {
 // Mock external services
 export const mockServices = {
   openai: {
-    createChatCompletion: jest.fn().mockResolvedValue({
+    createChatCompletion: () => Promise.resolve({
       choices: [{ message: { content: 'Mocked response' } }]
     })
   },
   
   supabase: {
     auth: {
-      getUser: jest.fn().mockResolvedValue({ data: { user: createTestUser() } })
+      getUser: () => Promise.resolve({ data: { user: createTestUser() } })
     },
-    from: jest.fn().mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({ data: createTestUser() })
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          single: () => Promise.resolve({ data: createTestUser() })
         })
       })
     })

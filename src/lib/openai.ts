@@ -3,10 +3,15 @@ import { z } from 'zod'
 
 // Initialize OpenAI client with error handling
 export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'placeholder-key',
   timeout: 30000, // 30 seconds
   maxRetries: 3,
 })
+
+// Export a function to check if OpenAI is properly configured
+export function isOpenAIConfigured() {
+  return !!(process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'placeholder-key')
+}
 
 // Types for calendar event parsing
 export interface ParsedEvent {
