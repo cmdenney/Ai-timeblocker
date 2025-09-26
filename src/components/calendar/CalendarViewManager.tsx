@@ -91,8 +91,12 @@ export function CalendarViewManager({
   const viewTransition = {
     initial: { opacity: 0, scale: 0.95, y: 20 },
     animate: { opacity: 1, scale: 1, y: 0 },
-    exit: { opacity: 0, scale: 1.05, y: -20 },
-    transition: { duration: 0.3, ease: "easeInOut" }
+    exit: { opacity: 0, scale: 1.05, y: -20 }
+  }
+
+  const transitionConfig = {
+    duration: 0.3,
+    ease: "easeInOut"
   }
 
   return (
@@ -174,6 +178,7 @@ export function CalendarViewManager({
               key="month"
               className="absolute inset-0"
               {...viewTransition}
+              transition={transitionConfig}
             >
               <MonthView
                 currentDate={currentDate}
@@ -189,6 +194,7 @@ export function CalendarViewManager({
               key="week"
               className="absolute inset-0"
               {...viewTransition}
+              transition={transitionConfig}
             >
               <WeekView
                 currentDate={currentDate}
@@ -206,6 +212,7 @@ export function CalendarViewManager({
               key="day"
               className="absolute inset-0"
               {...viewTransition}
+              transition={transitionConfig}
             >
               <DayView
                 currentDate={currentDate}
