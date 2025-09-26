@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn, getSession } from 'next-auth/react'
+import { AuthService } from '@/lib/supabase/auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -24,21 +24,14 @@ export function SignInForm({ callbackUrl = '/dashboard' }: SignInFormProps) {
       setIsLoading(true)
       setError(null)
       
-      const result = await signIn(provider, {
-        redirect: false,
-        callbackUrl,
-      })
-
-      if (result?.error) {
-        setError('Failed to sign in. Please try again.')
-      } else if (result?.ok) {
-        router.push(callbackUrl)
-        router.refresh()
-      }
-    } catch (error) {
+      // Use Supabase Auth for OAuth
+      await AuthService.signInWithProvider(provider)
+      
+      // The redirect will be handled by Supabase Auth
+      // User will be redirected to /auth/callback after OAuth
+    } catch (error: any) {
       console.error('Sign in error:', error)
-      setError('An unexpected error occurred. Please try again.')
-    } finally {
+      setError(error.message || 'An unexpected error occurred. Please try again.')
       setIsLoading(false)
     }
   }

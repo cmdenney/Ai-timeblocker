@@ -1,23 +1,10 @@
 import { NextAuthConfig } from "next-auth"
-import Google from "next-auth/providers/google"
-import GitHub from "next-auth/providers/github"
 
 export default {
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      authorization: {
-        params: {
-          scope: "openid email profile https://www.googleapis.com/auth/calendar"
-        }
-      }
-    }),
-    GitHub({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!
-    })
+    // OAuth providers are now handled by Supabase Auth
+    // See src/lib/supabase/auth.ts for OAuth implementation
   ],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {

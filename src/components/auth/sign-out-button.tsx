@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { signOut } from 'next-auth/react'
+import { AuthService } from '@/lib/supabase/auth'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -24,7 +24,9 @@ export function SignOutButton({ user, className }: SignOutButtonProps) {
   const handleSignOut = async () => {
     try {
       setIsLoading(true)
-      await signOut({ callbackUrl: '/' })
+      await AuthService.signOut()
+      router.push('/')
+      router.refresh()
     } catch (error) {
       console.error('Sign out error:', error)
     } finally {
