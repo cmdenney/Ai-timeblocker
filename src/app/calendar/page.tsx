@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { AuthService } from '@/lib/supabase/auth'
 import { CalendarService } from '@/lib/supabase/services/calendar'
 import { useRouter } from 'next/navigation'
-import { SimpleCalendarGrid } from '@/components/calendar/SimpleCalendarGrid'
+import { TestCalendarGrid } from '@/components/calendar/TestCalendarGrid'
 import { CalendarEvent } from '@/types/events'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -270,7 +270,7 @@ export default function CalendarPage() {
         {/* Full Screen Google-Style Calendar */}
         <div className="flex-1 overflow-hidden">
           <div className="h-full p-4">
-            <SimpleCalendarGrid
+            <TestCalendarGrid
               events={events}
               onEventClick={handleEventClick}
               onDateClick={handleDateClick}
