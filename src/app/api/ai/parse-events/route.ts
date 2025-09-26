@@ -12,11 +12,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { userInput, timezone = 'UTC' } = body
+    const { message, userInput, timezone = 'UTC' } = body
+    const input = message || userInput
 
-    if (!userInput) {
+    if (!input) {
       return NextResponse.json(
-        { error: 'User input is required' },
+        { error: 'Message is required' },
         { status: 400 }
       )
     }
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     // Parse calendar events
     const result = await parseCalendarEventsWithRetry(
-      userInput,
+      input,
       timezone,
       {
         currentDate: context.currentDate,
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     contextManager.addMessage(
       context.id,
       'user',
-      userInput,
+      input,
       { type: 'calendar_parse_request' }
     )
 
@@ -71,7 +72,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: result
+      message: result.message,
+      events: result.events,
+      metadata: result.metadata
     })
   } catch (error) {
     console.error('Parse events error:', error)

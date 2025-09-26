@@ -48,11 +48,11 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
       days.push(
         <div
           key={day.toString()}
-          className={`min-h-[100px] p-2 border border-border ${
-            !isSameMonth(day, monthStart) ? 'bg-muted/50' : 'bg-background'
+          className={`min-h-[120px] p-3 border-r border-b border-border last:border-r-0 ${
+            !isSameMonth(day, monthStart) ? 'bg-muted/30' : 'bg-background'
           } ${isSameDay(day, new Date()) ? 'bg-primary/10' : ''} ${
             selectedDate && isSameDay(day, selectedDate) ? 'bg-primary/20' : ''
-          } hover:bg-accent cursor-pointer`}
+          } hover:bg-accent cursor-pointer group`}
           onClick={() => {
             setSelectedDate(day)
             onDateClick?.(day)
@@ -117,51 +117,53 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>
-            {format(currentDate, 'MMMM yyyy')}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentDate(subMonths(currentDate, 1))}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentDate(new Date())}
-            >
-              Today
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentDate(addMonths(currentDate, 1))}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+    <div className="h-full flex flex-col">
+      {/* Calendar Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold">
+          {format(currentDate, 'MMMM yyyy')}
+        </h2>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentDate(subMonths(currentDate, 1))}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentDate(new Date())}
+          >
+            Today
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentDate(addMonths(currentDate, 1))}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          {/* Week day headers */}
-          <div className="grid grid-cols-7 gap-0">
-            {weekDays.map((day) => (
-              <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
-                {day}
-              </div>
-            ))}
-          </div>
-          {/* Calendar grid */}
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="flex-1 border border-border rounded-lg overflow-hidden">
+        {/* Week day headers */}
+        <div className="grid grid-cols-7 bg-muted/50">
+          {weekDays.map((day) => (
+            <div key={day} className="p-3 text-center text-sm font-medium text-muted-foreground border-r border-border last:border-r-0">
+              {day}
+            </div>
+          ))}
+        </div>
+        
+        {/* Calendar days */}
+        <div className="flex-1">
           {rows}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

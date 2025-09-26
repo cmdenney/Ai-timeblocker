@@ -18,7 +18,7 @@ export default function HomePage() {
         const user = await AuthService.getCurrentUser()
         setIsAuthenticated(!!user)
         if (user) {
-          router.push('/dashboard')
+          router.push('/calendar')
         }
       } catch (error) {
         console.error('Auth check failed:', error)
@@ -31,7 +31,7 @@ export default function HomePage() {
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
-      router.push('/dashboard')
+      router.push('/calendar')
     } else {
       router.push('/auth/signin')
     }
