@@ -13,6 +13,7 @@ import { CalendarEvent } from '@/types/events'
 import { EventList } from '@/components/events/EventList'
 import { EventModal } from '@/components/events/EventModal'
 import { useEventManagement } from '@/hooks/useEventManagement'
+import { CalendarHeader, CalendarView } from './CalendarHeader'
 
 export interface GoogleStyleCalendarProps {
   events?: CalendarEvent[]
@@ -20,11 +21,18 @@ export interface GoogleStyleCalendarProps {
   onDateClick?: (date: Date) => void
   onAddEvent?: (date: Date) => void
   onMonthChange?: (date: Date) => void
+  onSearch?: (query: string) => void
+  user?: {
+    name?: string
+    email?: string
+    avatar?: string
+  }
   className?: string
   showNavigation?: boolean
   showTodayButton?: boolean
   maxEventsPerDay?: number
   loading?: boolean
+  showHeader?: boolean
 }
 
 // Event category colors are now imported from types/events
@@ -36,15 +44,19 @@ export function GoogleStyleCalendar({
   onDateClick,
   onAddEvent,
   onMonthChange,
+  onSearch,
+  user,
   className = '',
   showNavigation = true,
   showTodayButton = true,
   maxEventsPerDay = 4,
-  loading = false
+  loading = false,
+  showHeader = true
 }: GoogleStyleCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null)
+  const [currentView, setCurrentView] = useState<CalendarView>('month')
   const calendarRef = useRef<HTMLDivElement>(null)
   
   // Use event management hook
@@ -120,6 +132,25 @@ export function GoogleStyleCalendar({
     handleEventClick(event)
   }, [handleEventClick])
 
+  // Header handlers
+  const handleHeaderDateChange = useCallback((date: Date) => {
+    setCurrentDate(date)
+    onMonthChange?.(date)
+  }, [onMonthChange])
+
+  const handleHeaderCreateEvent = useCallback((date?: Date) => {
+    openCreateModal(date || currentDate)
+  }, [openCreateModal, currentDate])
+
+  const handleHeaderSearch = useCallback((query: string) => {
+    onSearch?.(query)
+  }, [onSearch])
+
+  const handleViewChange = useCallback((view: CalendarView) => {
+    setCurrentView(view)
+    // TODO: Implement view switching logic
+  }, [])
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -178,40 +209,16 @@ export function GoogleStyleCalendar({
       role="application"
       aria-label="Calendar"
     >
-      {/* Header */}
-      {showNavigation && (
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl font-semibold text-gray-900">
-              {format(currentDate, 'MMMM yyyy')}
-            </h2>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={goToPreviousMonth}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                aria-label="Previous month"
-              >
-                <ChevronLeft className="h-5 w-5 text-gray-600" />
-              </button>
-              {showTodayButton && (
-                <button
-                  onClick={goToToday}
-                  className="px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                  aria-label="Go to today"
-                >
-                  Today
-                </button>
-              )}
-              <button
-                onClick={goToNextMonth}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                aria-label="Next month"
-              >
-                <ChevronRight className="h-5 w-5 text-gray-600" />
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Calendar Header */}
+      {showHeader && (
+        <CalendarHeader
+          currentDate={currentDate}
+          onDateChange={handleHeaderDateChange}
+          onViewChange={handleViewChange}
+          onCreateEvent={handleHeaderCreateEvent}
+          onSearch={handleHeaderSearch}
+          user={user}
+        />
       )}
 
       {/* Calendar Grid */}
