@@ -6,14 +6,30 @@ import {
   ChevronRight, 
   Plus, 
   MoreHorizontal,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  Loader2
 } from 'lucide-react'
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths, isToday, getDay } from 'date-fns'
+import { 
+  format, 
+  startOfMonth, 
+  endOfMonth, 
+  startOfWeek, 
+  endOfWeek, 
+  addDays, 
+  isSameMonth, 
+  isSameDay, 
+  addMonths, 
+  subMonths, 
+  isToday, 
+  getDay,
+  isWeekend
+} from 'date-fns'
 import { CalendarEvent } from '@/types/events'
 import { EventList } from '@/components/events/EventList'
 import { EventModal } from '@/components/events/EventModal'
 import { useEventManagement } from '@/hooks/useEventManagement'
 import { CalendarHeader, CalendarView } from './CalendarHeader'
+import { CalendarGrid, WeekDayHeaders } from './CalendarGrid'
 
 export interface GoogleStyleCalendarProps {
   events?: CalendarEvent[]
@@ -35,9 +51,7 @@ export interface GoogleStyleCalendarProps {
   showHeader?: boolean
 }
 
-// Event category colors are now imported from types/events
-
-// Main Calendar Component
+// Enhanced Calendar Grid Component
 export function GoogleStyleCalendar({
   events = [],
   onEventClick,
@@ -77,13 +91,13 @@ export function GoogleStyleCalendar({
     handleEventSave
   } = useEventManagement(events)
 
-  // Calculate calendar grid
+  // Calculate calendar grid with proper date logic
   const monthStart = startOfMonth(currentDate)
   const monthEnd = endOfMonth(monthStart)
   const startDate = startOfWeek(monthStart, { weekStartsOn: 0 }) // Start on Sunday
   const endDate = endOfWeek(monthEnd, { weekStartsOn: 0 })
 
-  // Generate calendar days
+  // Generate calendar days array (42 days total for 6 weeks)
   const generateCalendarDays = useCallback(() => {
     const days = []
     let day = startDate
@@ -98,25 +112,8 @@ export function GoogleStyleCalendar({
 
   const calendarDays = generateCalendarDays()
 
-  // Navigation handlers
-  const goToPreviousMonth = useCallback(() => {
-    const newDate = subMonths(currentDate, 1)
-    setCurrentDate(newDate)
-    onMonthChange?.(newDate)
-  }, [currentDate, onMonthChange])
-
-  const goToNextMonth = useCallback(() => {
-    const newDate = addMonths(currentDate, 1)
-    setCurrentDate(newDate)
-    onMonthChange?.(newDate)
-  }, [currentDate, onMonthChange])
-
-  const goToToday = useCallback(() => {
-    const today = new Date()
-    setCurrentDate(today)
-    setSelectedDate(today)
-    onMonthChange?.(today)
-  }, [onMonthChange])
+  // Week day headers
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
   // Enhanced event handlers
   const handleDateClick = useCallback((date: Date) => {
@@ -159,56 +156,49 @@ export function GoogleStyleCalendar({
       switch (event.key) {
         case 'ArrowLeft':
           event.preventDefault()
-          goToPreviousMonth()
+          const prevMonth = subMonths(currentDate, 1)
+          setCurrentDate(prevMonth)
+          onMonthChange?.(prevMonth)
           break
         case 'ArrowRight':
           event.preventDefault()
-          goToNextMonth()
+          const nextMonth = addMonths(currentDate, 1)
+          setCurrentDate(nextMonth)
+          onMonthChange?.(nextMonth)
           break
         case 'Home':
           event.preventDefault()
-          goToToday()
+          const today = new Date()
+          setCurrentDate(today)
+          setSelectedDate(today)
+          onMonthChange?.(today)
           break
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [goToPreviousMonth, goToNextMonth, goToToday])
-
-  // Week day headers
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
-        <div className="p-6">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded mb-4"></div>
-            <div className="grid grid-cols-7 gap-1 mb-2">
-              {Array.from({ length: 7 }).map((_, i) => (
-                <div key={i} className="h-8 bg-gray-200 rounded"></div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-1">
-              {Array.from({ length: 42 }).map((_, i) => (
-                <div key={i} className="h-24 bg-gray-200 rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  }, [currentDate, onMonthChange])
 
   return (
-    <div 
+    <div
       ref={calendarRef}
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}
+      className={`
+        bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden
+        ${className}
+      `}
       role="application"
       aria-label="Calendar"
     >
+      {loading && (
+        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+            <span className="text-sm text-gray-600">Loading calendar...</span>
+          </div>
+        </div>
+      )}
+
       {/* Calendar Header */}
       {showHeader && (
         <CalendarHeader
@@ -221,104 +211,27 @@ export function GoogleStyleCalendar({
         />
       )}
 
-      {/* Calendar Grid */}
-      <div className="p-4">
+      {/* Calendar Grid Container */}
+      <div className="flex flex-col h-full">
         {/* Week day headers */}
-        <div className="grid grid-cols-7 gap-1 mb-2">
-          {weekDays.map((day) => (
-            <div
-              key={day}
-              className="p-3 text-center text-sm font-medium text-gray-500 uppercase tracking-wide"
-              role="columnheader"
-            >
-              {day}
-            </div>
-          ))}
-        </div>
+        <WeekDayHeaders />
 
-        {/* Calendar days */}
-        <div className="grid grid-cols-7 gap-1">
-          {calendarDays.map((day, index) => {
-            const isCurrentMonth = isSameMonth(day, monthStart)
-            const isTodayDate = isToday(day)
-            const isSelected = selectedDate && isSameDay(day, selectedDate)
-            const isHovered = hoveredDate && isSameDay(day, hoveredDate)
-            const dayEvents = getEventsForDate(day)
-            const hasMoreEvents = dayEvents.length > maxEventsPerDay
-
-            return (
-              <div
-                key={day.toISOString()}
-                className={`
-                  min-h-[120px] p-2 border border-gray-100 rounded-lg cursor-pointer transition-all duration-200
-                  ${isCurrentMonth ? 'bg-white' : 'bg-gray-50'}
-                  ${isTodayDate ? 'bg-blue-50 border-blue-200' : ''}
-                  ${isSelected ? 'bg-blue-100 border-blue-300' : ''}
-                  ${isHovered ? 'bg-gray-50 shadow-sm' : ''}
-                  hover:bg-gray-50 hover:shadow-sm
-                  group relative
-                `}
-                onClick={() => handleDateClick(day)}
-                onMouseEnter={() => setHoveredDate(day)}
-                onMouseLeave={() => setHoveredDate(null)}
-                role="gridcell"
-                aria-label={`${format(day, 'MMMM d, yyyy')}${isTodayDate ? ', today' : ''}`}
-                tabIndex={0}
-              >
-                {/* Date number */}
-                <div className="flex items-center justify-between mb-1">
-                  <span
-                    className={`
-                      text-sm font-medium
-                      ${isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}
-                      ${isTodayDate ? 'text-blue-600 font-semibold' : ''}
-                    `}
-                  >
-                    {format(day, 'd')}
-                  </span>
-                  
-                  {/* Add event button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleAddEventClick(day)
-                    }}
-                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded-full transition-all"
-                    aria-label={`Add event on ${format(day, 'MMMM d, yyyy')}`}
-                  >
-                    <Plus className="h-3 w-3 text-gray-500" />
-                  </button>
-                </div>
-
-                {/* Events using EventList component */}
-                <div className="flex-1">
-                  <EventList
-                    events={dayEvents}
-                    date={day}
-                    maxVisibleEvents={maxEventsPerDay}
-                    displayConfig={{
-                      showTime: true,
-                      showLocation: false,
-                      showAttendees: false,
-                      maxTitleLength: 20,
-                      compactMode: true
-                    }}
-                    onEventClick={handleEventClickInternal}
-                    onEventEdit={handleEventEdit}
-                    onEventDelete={handleEventDelete}
-                    onEventDuplicate={handleEventDuplicate}
-                    onAddEvent={handleAddEventClick}
-                  />
-                </div>
-
-                {/* Today indicator */}
-                {isTodayDate && (
-                  <div className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full"></div>
-                )}
-              </div>
-            )
-          })}
-        </div>
+        {/* Calendar days grid */}
+        <CalendarGrid
+          calendarDays={calendarDays}
+          monthStart={monthStart}
+          selectedDate={selectedDate}
+          hoveredDate={hoveredDate}
+          dayEvents={getEventsForDate}
+          maxEventsPerDay={maxEventsPerDay}
+          onDateClick={handleDateClick}
+          onAddEvent={handleAddEventClick}
+          onEventClick={handleEventClickInternal}
+          onEventEdit={handleEventEdit}
+          onEventDelete={handleEventDelete}
+          onEventDuplicate={handleEventDuplicate}
+          setHoveredDate={setHoveredDate}
+        />
       </div>
       
       {/* Event Modal */}
@@ -346,7 +259,7 @@ export class CalendarErrorBoundary extends React.Component<
     this.state = { hasError: false }
   }
 
-  static getDerivedStateFromError(): { hasError: boolean } {
+  static getDerivedStateFromError(error: Error) {
     return { hasError: true }
   }
 
@@ -356,36 +269,27 @@ export class CalendarErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback || (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="text-center">
+      return (
+        this.props.fallback || (
+          <div className="p-8 text-center">
             <CalendarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               Calendar Error
             </h3>
-            <p className="text-gray-500 mb-4">
-              Something went wrong loading the calendar. Please refresh the page.
+            <p className="text-gray-600 mb-4">
+              Something went wrong loading the calendar.
             </p>
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
-              Refresh Page
+              Reload Calendar
             </button>
           </div>
-        </div>
+        )
       )
     }
 
     return this.props.children
   }
-}
-
-// Default export with error boundary
-export default function GoogleStyleCalendarWithErrorBoundary(props: GoogleStyleCalendarProps) {
-  return (
-    <CalendarErrorBoundary>
-      <GoogleStyleCalendar {...props} />
-    </CalendarErrorBoundary>
-  )
 }
