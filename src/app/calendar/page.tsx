@@ -149,19 +149,14 @@ export default function CalendarPage() {
   return (
     <MainLayout user={currentUser}>
       <div className="h-full flex flex-col">
-        {/* Top Controls */}
-        <div className="p-4 border-b border-border bg-background">
+        {/* Top Controls - Compact */}
+        <div className="px-4 py-2 border-b border-border bg-background">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                <CalendarIcon className="h-6 w-6" />
+            <div className="flex items-center gap-4">
+              <h1 className="text-lg font-semibold flex items-center gap-2">
+                <CalendarIcon className="h-5 w-5" />
                 Calendar
               </h1>
-              <p className="text-sm text-muted-foreground">
-                Manage your schedule and time blocks
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
               {isGoogleConnected && (
                 <Button 
                   onClick={syncWithGoogle} 
@@ -169,43 +164,32 @@ export default function CalendarPage() {
                   variant="outline"
                   size="sm"
                 >
-                  <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`mr-2 h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
                   {isSyncing ? 'Syncing...' : 'Sync Google'}
                 </Button>
               )}
-              <Button onClick={() => handleAddEvent(new Date())} size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Event
-              </Button>
             </div>
+            <Button onClick={() => handleAddEvent(new Date())} size="sm">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Event
+            </Button>
           </div>
 
-          {/* Google Calendar Status */}
-          {isGoogleConnected ? (
-            <Alert className="mt-4">
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription>
-                Google Calendar is connected! Your events will sync automatically.
-              </AlertDescription>
-            </Alert>
-          ) : (
-            <Alert variant="destructive" className="mt-4">
-              <AlertDescription>
-                Google Calendar is not connected. Sign in with Google to sync your calendar.
-              </AlertDescription>
-            </Alert>
+          {/* Status Messages - Compact */}
+          {!isGoogleConnected && (
+            <div className="mt-2 text-xs text-muted-foreground">
+              Google Calendar is not connected. Sign in with Google to sync your calendar.
+            </div>
           )}
-
-          {/* Sync Message */}
           {syncMessage && (
-            <Alert className="mt-4">
-              <AlertDescription>{syncMessage}</AlertDescription>
-            </Alert>
+            <div className="mt-2 text-xs text-green-600">
+              {syncMessage}
+            </div>
           )}
         </div>
 
-        {/* Full Screen Calendar */}
-        <div className="flex-1 p-4">
+        {/* Full Screen Calendar - Takes remaining space */}
+        <div className="flex-1 overflow-hidden">
           <Calendar
             events={events}
             onEventClick={handleEventClick}

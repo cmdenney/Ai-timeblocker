@@ -48,11 +48,11 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
       days.push(
         <div
           key={day.toString()}
-          className={`min-h-[120px] p-3 border-r border-b border-border last:border-r-0 ${
+          className={`h-full p-2 border-r border-b border-border last:border-r-0 ${
             !isSameMonth(day, monthStart) ? 'bg-muted/30' : 'bg-background'
           } ${isSameDay(day, new Date()) ? 'bg-primary/10' : ''} ${
             selectedDate && isSameDay(day, selectedDate) ? 'bg-primary/20' : ''
-          } hover:bg-accent cursor-pointer group`}
+          } hover:bg-accent cursor-pointer group flex flex-col`}
           onClick={() => {
             setSelectedDate(day)
             onDateClick?.(day)
@@ -76,8 +76,8 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
               <Plus className="h-3 w-3" />
             </Button>
           </div>
-          <div className="space-y-1">
-            {dayEvents.slice(0, 3).map((event) => (
+          <div className="flex-1 space-y-1 overflow-hidden">
+            {dayEvents.slice(0, 4).map((event) => (
               <div
                 key={event.id}
                 className={`text-xs p-1 rounded truncate cursor-pointer ${
@@ -96,9 +96,9 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
                 {event.title}
               </div>
             ))}
-            {dayEvents.length > 3 && (
+            {dayEvents.length > 4 && (
               <div className="text-xs text-muted-foreground">
-                +{dayEvents.length - 3} more
+                +{dayEvents.length - 4} more
               </div>
             )}
           </div>
@@ -118,9 +118,9 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
 
   return (
     <div className="h-full flex flex-col">
-      {/* Calendar Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">
+      {/* Calendar Header - Compact */}
+      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-background">
+        <h2 className="text-lg font-semibold">
           {format(currentDate, 'MMMM yyyy')}
         </h2>
         <div className="flex items-center gap-2">
@@ -148,10 +148,10 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
         </div>
       </div>
 
-      {/* Calendar Grid */}
-      <div className="flex-1 border border-border rounded-lg overflow-hidden">
+      {/* Full Screen Calendar Grid */}
+      <div className="flex-1 flex flex-col">
         {/* Week day headers */}
-        <div className="grid grid-cols-7 bg-muted/50">
+        <div className="grid grid-cols-7 bg-muted/50 border-b border-border">
           {weekDays.map((day) => (
             <div key={day} className="p-3 text-center text-sm font-medium text-muted-foreground border-r border-border last:border-r-0">
               {day}
@@ -159,8 +159,8 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
           ))}
         </div>
         
-        {/* Calendar days */}
-        <div className="flex-1">
+        {/* Calendar days - Full height */}
+        <div className="flex-1 grid grid-rows-6">
           {rows}
         </div>
       </div>
