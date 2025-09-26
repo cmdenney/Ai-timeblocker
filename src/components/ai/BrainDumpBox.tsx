@@ -311,10 +311,10 @@ export function BrainDumpBox({ onTasksGenerated, className }: BrainDumpBoxProps)
           >
             <div className="font-medium">💡 Tips for better results:</div>
             <ul className="space-y-1 ml-4">
-              <li>• Include deadlines: "presentation due Friday"</li>
-              <li>• Mention energy levels: "need to focus on..."</li>
-              <li>• Add context: "30-minute call with client"</li>
-              <li>• Include priorities: "urgent", "important", "can wait"</li>
+              <li>• Include deadlines: &quot;presentation due Friday&quot;</li>
+              <li>• Mention energy levels: &quot;need to focus on...&quot;</li>
+              <li>• Add context: &quot;30-minute call with client&quot;</li>
+              <li>• Include priorities: &quot;urgent&quot;, &quot;important&quot;, &quot;can wait&quot;</li>
             </ul>
           </motion.div>
         )}

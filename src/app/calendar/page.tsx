@@ -422,7 +422,7 @@ export default function CalendarPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CalendarIcon className="h-4 w-4" />
-                  Today's Tasks
+                  Today&apos;s Tasks
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -448,7 +448,7 @@ export default function CalendarPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
-                  This Week's Focus
+                  This Week&apos;s Focus
                 </CardTitle>
               </CardHeader>
               <CardContent>
