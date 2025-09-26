@@ -9,19 +9,10 @@ import {
   Calendar as CalendarIcon
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths, isToday, getDay } from 'date-fns'
-
-// Types
-export interface CalendarEvent {
-  id: string
-  title: string
-  startTime: Date
-  endTime: Date
-  isAllDay: boolean
-  description?: string
-  location?: string
-  category?: 'work' | 'personal' | 'meeting' | 'break' | 'focus' | 'other'
-  color?: string
-}
+import { CalendarEvent } from '@/types/events'
+import { EventList } from '@/components/events/EventList'
+import { EventModal } from '@/components/events/EventModal'
+import { useEventManagement } from '@/hooks/useEventManagement'
 
 export interface GoogleStyleCalendarProps {
   events?: CalendarEvent[]
@@ -36,15 +27,7 @@ export interface GoogleStyleCalendarProps {
   loading?: boolean
 }
 
-// Event category colors
-const EVENT_COLORS = {
-  work: 'bg-blue-100 text-blue-800 border-blue-200',
-  personal: 'bg-green-100 text-green-800 border-green-200',
-  meeting: 'bg-purple-100 text-purple-800 border-purple-200',
-  break: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  focus: 'bg-red-100 text-red-800 border-red-200',
-  other: 'bg-gray-100 text-gray-800 border-gray-200',
-}
+// Event category colors are now imported from types/events
 
 // Main Calendar Component
 export function GoogleStyleCalendar({
@@ -63,6 +46,24 @@ export function GoogleStyleCalendar({
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null)
   const calendarRef = useRef<HTMLDivElement>(null)
+  
+  // Use event management hook
+  const {
+    events: managedEvents,
+    isModalOpen,
+    modalMode,
+    selectedEvent,
+    getEventsForDate,
+    openCreateModal,
+    openEditModal,
+    openViewModal,
+    closeModal,
+    handleEventClick,
+    handleEventEdit,
+    handleEventDelete,
+    handleEventDuplicate,
+    handleEventSave
+  } = useEventManagement(events)
 
   // Calculate calendar grid
   const monthStart = startOfMonth(currentDate)
@@ -105,26 +106,19 @@ export function GoogleStyleCalendar({
     onMonthChange?.(today)
   }, [onMonthChange])
 
-  // Event handlers
+  // Enhanced event handlers
   const handleDateClick = useCallback((date: Date) => {
     setSelectedDate(date)
     onDateClick?.(date)
   }, [onDateClick])
 
-  const handleAddEventClick = useCallback((date: Date, event: React.MouseEvent) => {
-    event.stopPropagation()
-    onAddEvent?.(date)
-  }, [onAddEvent])
+  const handleAddEventClick = useCallback((date: Date) => {
+    openCreateModal(date)
+  }, [openCreateModal])
 
-  const handleEventClick = useCallback((event: CalendarEvent, clickEvent: React.MouseEvent) => {
-    clickEvent.stopPropagation()
-    onEventClick?.(event)
-  }, [onEventClick])
-
-  // Get events for a specific date
-  const getEventsForDate = useCallback((date: Date) => {
-    return events.filter(event => isSameDay(event.startTime, date))
-  }, [events])
+  const handleEventClickInternal = useCallback((event: CalendarEvent) => {
+    handleEventClick(event)
+  }, [handleEventClick])
 
   // Keyboard navigation
   useEffect(() => {
@@ -278,7 +272,10 @@ export function GoogleStyleCalendar({
                   
                   {/* Add event button */}
                   <button
-                    onClick={(e) => handleAddEventClick(day, e)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleAddEventClick(day)
+                    }}
                     className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded-full transition-all"
                     aria-label={`Add event on ${format(day, 'MMMM d, yyyy')}`}
                   >
@@ -286,32 +283,25 @@ export function GoogleStyleCalendar({
                   </button>
                 </div>
 
-                {/* Events */}
-                <div className="space-y-1 flex-1">
-                  {dayEvents.slice(0, maxEventsPerDay).map((event) => (
-                    <div
-                      key={event.id}
-                      className={`
-                        text-xs p-1 rounded border-l-2 truncate cursor-pointer transition-colors
-                        ${EVENT_COLORS[event.category || 'other']}
-                        hover:shadow-sm
-                      `}
-                      onClick={(e) => handleEventClick(event, e)}
-                      title={`${event.title}${event.description ? ` - ${event.description}` : ''}`}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Event: ${event.title}`}
-                    >
-                      {event.title}
-                    </div>
-                  ))}
-                  
-                  {/* More events indicator */}
-                  {hasMoreEvents && (
-                    <div className="text-xs text-gray-500 font-medium">
-                      +{dayEvents.length - maxEventsPerDay} more
-                    </div>
-                  )}
+                {/* Events using EventList component */}
+                <div className="flex-1">
+                  <EventList
+                    events={dayEvents}
+                    date={day}
+                    maxVisibleEvents={maxEventsPerDay}
+                    displayConfig={{
+                      showTime: true,
+                      showLocation: false,
+                      showAttendees: false,
+                      maxTitleLength: 20,
+                      compactMode: true
+                    }}
+                    onEventClick={handleEventClickInternal}
+                    onEventEdit={handleEventEdit}
+                    onEventDelete={handleEventDelete}
+                    onEventDuplicate={handleEventDuplicate}
+                    onAddEvent={handleAddEventClick}
+                  />
                 </div>
 
                 {/* Today indicator */}
@@ -323,6 +313,18 @@ export function GoogleStyleCalendar({
           })}
         </div>
       </div>
+      
+      {/* Event Modal */}
+      <EventModal
+        event={selectedEvent}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onSave={handleEventSave}
+        onDelete={handleEventDelete}
+        onDuplicate={handleEventDuplicate}
+        defaultDate={selectedDate || new Date()}
+        mode={modalMode}
+      />
     </div>
   )
 }

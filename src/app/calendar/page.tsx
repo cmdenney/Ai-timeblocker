@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { AuthService } from '@/lib/supabase/auth'
 import { CalendarService } from '@/lib/supabase/services/calendar'
 import { useRouter } from 'next/navigation'
-import { GoogleStyleCalendar, CalendarEvent } from '@/components/calendar/GoogleStyleCalendar'
+import { GoogleStyleCalendar } from '@/components/calendar/GoogleStyleCalendar'
+import { CalendarEvent } from '@/types/events'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -56,12 +57,18 @@ export default function CalendarPage() {
       setEvents(userEvents.map(event => ({
         id: event.id,
         title: event.title,
+        description: event.description || '',
         startTime: new Date(event.start_time),
         endTime: new Date(event.end_time),
         isAllDay: event.is_all_day || false,
-        description: event.description,
-        location: event.location,
-        category: event.category as any
+        category: (event.category as any) || 'other',
+        priority: 'medium',
+        status: 'confirmed',
+        location: event.location || '',
+        attendees: [],
+        color: '',
+        reminders: [],
+        metadata: {}
       })))
     } catch (error) {
       console.error('Failed to load events:', error)
@@ -104,52 +111,81 @@ export default function CalendarPage() {
     }
   }
 
-  // Sample events for demonstration
+  // Enhanced sample events for demonstration
   const sampleEvents: CalendarEvent[] = [
     {
       id: '1',
       title: 'Team Meeting',
+      description: 'Weekly team sync and project updates',
       startTime: new Date(2024, 11, 15, 10, 0), // December 15, 2024, 10:00 AM
       endTime: new Date(2024, 11, 15, 11, 0),
       isAllDay: false,
       category: 'meeting',
-      description: 'Weekly team sync'
+      priority: 'high',
+      status: 'confirmed',
+      location: 'Conference Room A',
+      attendees: ['john@company.com', 'jane@company.com']
     },
     {
       id: '2',
       title: 'Focus Time',
+      description: 'Deep work session for project development',
       startTime: new Date(2024, 11, 16, 9, 0), // December 16, 2024, 9:00 AM
       endTime: new Date(2024, 11, 16, 12, 0),
       isAllDay: false,
       category: 'focus',
-      description: 'Deep work session'
+      priority: 'medium',
+      status: 'confirmed',
+      location: 'Home Office'
     },
     {
       id: '3',
       title: 'Lunch Break',
+      description: 'Lunch with colleagues',
       startTime: new Date(2024, 11, 17, 12, 0), // December 17, 2024, 12:00 PM
       endTime: new Date(2024, 11, 17, 13, 0),
       isAllDay: false,
       category: 'break',
-      description: 'Lunch with colleagues'
+      priority: 'low',
+      status: 'confirmed',
+      location: 'Downtown Restaurant'
     },
     {
       id: '4',
       title: 'Project Review',
+      description: 'Quarterly project review and planning',
       startTime: new Date(2024, 11, 18, 14, 0), // December 18, 2024, 2:00 PM
       endTime: new Date(2024, 11, 18, 15, 30),
       isAllDay: false,
       category: 'work',
-      description: 'Quarterly project review'
+      priority: 'urgent',
+      status: 'confirmed',
+      location: 'Boardroom',
+      attendees: ['manager@company.com', 'team@company.com']
     },
     {
       id: '5',
       title: 'Personal Time',
+      description: 'Gym workout and personal time',
       startTime: new Date(2024, 11, 19, 17, 0), // December 19, 2024, 5:00 PM
       endTime: new Date(2024, 11, 19, 18, 0),
       isAllDay: false,
       category: 'personal',
-      description: 'Gym workout'
+      priority: 'low',
+      status: 'confirmed',
+      location: 'Fitness Center'
+    },
+    {
+      id: '6',
+      title: 'All Day Conference',
+      description: 'Annual tech conference',
+      startTime: new Date(2024, 11, 20, 0, 0), // December 20, 2024
+      endTime: new Date(2024, 11, 20, 23, 59),
+      isAllDay: true,
+      category: 'important',
+      priority: 'high',
+      status: 'confirmed',
+      location: 'Convention Center'
     }
   ]
 
