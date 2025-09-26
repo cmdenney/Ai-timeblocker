@@ -156,49 +156,123 @@
 }
 
 @layer components {
-  /* Calendar cell styling */
+  /* Eisenhower Matrix Task Colors */
+  .task-q1 {
+    @apply bg-orange-200/60 border-l-4 border-orange-400 text-orange-800;
+  }
+  
+  .task-q2 {
+    @apply bg-blue-200/60 border-l-4 border-blue-400 text-blue-800;
+  }
+  
+  .task-q3 {
+    @apply bg-purple-200/60 border-l-4 border-purple-400 text-purple-800;
+  }
+  
+  .task-q4 {
+    @apply bg-red-200/60 border-l-4 border-red-400 text-red-800;
+  }
+
+  /* Dark mode variants */
+  .dark .task-q1 {
+    @apply bg-orange-900/30 border-orange-600 text-orange-200;
+  }
+  
+  .dark .task-q2 {
+    @apply bg-blue-900/30 border-blue-600 text-blue-200;
+  }
+  
+  .dark .task-q3 {
+    @apply bg-purple-900/30 border-purple-600 text-purple-200;
+  }
+  
+  .dark .task-q4 {
+    @apply bg-red-900/30 border-red-600 text-red-200;
+  }
+
+  /* Time Slot Grid */
+  .time-slot {
+    @apply border-r border-b border-gray-200/50 hover:bg-gray-50/50 transition-colors duration-150 cursor-pointer;
+  }
+  
+  .time-slot-hour {
+    @apply border-b-2 border-gray-300/70;
+  }
+  
+  .time-slot-half-hour {
+    @apply border-b border-gray-200/50;
+  }
+  
+  .time-slot-current {
+    @apply bg-blue-50/80 border-blue-200/50;
+  }
+  
+  .time-slot-occupied {
+    @apply cursor-not-allowed;
+  }
+
+  /* Calendar Views */
   .calendar-cell {
-    @apply w-10 h-10 aspect-square rounded-md border border-border bg-card hover:bg-accent transition-colors duration-200;
+    @apply w-full h-full min-h-[120px] rounded-lg border border-border bg-card hover:bg-accent/50 transition-all duration-200 cursor-pointer;
   }
   
   .calendar-cell-today {
-    @apply bg-primary/10 border-primary/20 ring-1 ring-primary/20;
+    @apply bg-primary/5 border-primary/30 ring-1 ring-primary/20;
   }
   
   .calendar-cell-selected {
-    @apply bg-primary text-primary-foreground border-primary;
+    @apply bg-primary/10 border-primary ring-2 ring-primary/30;
   }
   
-  .calendar-cell-event {
-    @apply relative overflow-hidden;
+  .calendar-cell-other-month {
+    @apply opacity-40 bg-muted/30;
+  }
+
+  /* Task Blocks */
+  .task-block {
+    @apply rounded-md px-2 py-1 text-xs font-medium shadow-sm border-l-4 transition-all duration-200 hover:shadow-md cursor-pointer;
   }
   
-  .calendar-event {
-    @apply absolute inset-1 rounded-sm text-xs font-medium text-white shadow-sm;
+  .task-block-dragging {
+    @apply shadow-lg scale-105 rotate-1 z-50;
   }
   
-  .calendar-event-work {
-    @apply bg-event-work;
+  .task-block-drop-target {
+    @apply ring-2 ring-primary/50 bg-primary/10;
+  }
+
+  /* Energy Level Indicators */
+  .energy-high {
+    @apply bg-green-50 border-green-200 text-green-800;
   }
   
-  .calendar-event-personal {
-    @apply bg-event-personal;
+  .energy-medium {
+    @apply bg-yellow-50 border-yellow-200 text-yellow-800;
   }
   
-  .calendar-event-meeting {
-    @apply bg-event-meeting;
+  .energy-low {
+    @apply bg-red-50 border-red-200 text-red-800;
+  }
+
+  /* Calendar Navigation */
+  .calendar-nav {
+    @apply flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur-sm sticky top-0 z-40;
   }
   
-  .calendar-event-break {
-    @apply bg-event-break;
+  .view-toggle {
+    @apply inline-flex rounded-lg bg-muted p-1;
   }
   
-  .calendar-event-focus {
-    @apply bg-event-focus;
+  .view-toggle-button {
+    @apply px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200;
   }
   
-  .calendar-event-other {
-    @apply bg-event-other;
+  .view-toggle-button-active {
+    @apply bg-background text-foreground shadow-sm;
+  }
+  
+  .view-toggle-button-inactive {
+    @apply text-muted-foreground hover:text-foreground hover:bg-background/50;
   }
   
   /* Chat message bubbles */
