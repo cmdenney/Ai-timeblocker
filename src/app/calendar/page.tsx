@@ -4,23 +4,14 @@ import { useState, useEffect } from 'react'
 import { AuthService } from '@/lib/supabase/auth'
 import { CalendarService } from '@/lib/supabase/services/calendar'
 import { useRouter } from 'next/navigation'
-import { Calendar } from '@/components/calendar/Calendar'
+import { GoogleStyleCalendar, CalendarEvent } from '@/components/calendar/GoogleStyleCalendar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Plus, Calendar as CalendarIcon, RefreshCw, CheckCircle } from 'lucide-react'
 import { MainLayout } from '@/components/layout/main-layout'
 
-interface CalendarEvent {
-  id: string
-  title: string
-  startTime: Date
-  endTime: Date
-  isAllDay: boolean
-  description?: string
-  location?: string
-  category?: 'work' | 'personal' | 'meeting' | 'break' | 'focus' | 'other'
-}
+// CalendarEvent interface is now imported from GoogleStyleCalendar
 
 export default function CalendarPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -113,21 +104,73 @@ export default function CalendarPage() {
     }
   }
 
-  const [events, setEvents] = useState<CalendarEvent[]>([])
+  // Sample events for demonstration
+  const sampleEvents: CalendarEvent[] = [
+    {
+      id: '1',
+      title: 'Team Meeting',
+      startTime: new Date(2024, 11, 15, 10, 0), // December 15, 2024, 10:00 AM
+      endTime: new Date(2024, 11, 15, 11, 0),
+      isAllDay: false,
+      category: 'meeting',
+      description: 'Weekly team sync'
+    },
+    {
+      id: '2',
+      title: 'Focus Time',
+      startTime: new Date(2024, 11, 16, 9, 0), // December 16, 2024, 9:00 AM
+      endTime: new Date(2024, 11, 16, 12, 0),
+      isAllDay: false,
+      category: 'focus',
+      description: 'Deep work session'
+    },
+    {
+      id: '3',
+      title: 'Lunch Break',
+      startTime: new Date(2024, 11, 17, 12, 0), // December 17, 2024, 12:00 PM
+      endTime: new Date(2024, 11, 17, 13, 0),
+      isAllDay: false,
+      category: 'break',
+      description: 'Lunch with colleagues'
+    },
+    {
+      id: '4',
+      title: 'Project Review',
+      startTime: new Date(2024, 11, 18, 14, 0), // December 18, 2024, 2:00 PM
+      endTime: new Date(2024, 11, 18, 15, 30),
+      isAllDay: false,
+      category: 'work',
+      description: 'Quarterly project review'
+    },
+    {
+      id: '5',
+      title: 'Personal Time',
+      startTime: new Date(2024, 11, 19, 17, 0), // December 19, 2024, 5:00 PM
+      endTime: new Date(2024, 11, 19, 18, 0),
+      isAllDay: false,
+      category: 'personal',
+      description: 'Gym workout'
+    }
+  ]
+
+  const [events, setEvents] = useState<CalendarEvent[]>(sampleEvents)
 
   const handleEventClick = (event: CalendarEvent) => {
     console.log('Event clicked:', event)
     // TODO: Open event details modal
+    alert(`Event: ${event.title}\nTime: ${event.startTime.toLocaleTimeString()} - ${event.endTime.toLocaleTimeString()}\nDescription: ${event.description || 'No description'}`)
   }
 
   const handleDateClick = (date: Date) => {
     console.log('Date clicked:', date)
     // TODO: Open add event modal for this date
+    alert(`Add event for ${date.toLocaleDateString()}`)
   }
 
   const handleAddEvent = (date: Date) => {
     console.log('Add event for date:', date)
     // TODO: Open add event modal
+    alert(`Add event for ${date.toLocaleDateString()}`)
   }
 
   if (isLoading) {
@@ -188,13 +231,22 @@ export default function CalendarPage() {
           )}
         </div>
 
-        {/* Full Screen Calendar - Takes remaining space */}
-        <div className="flex-1 overflow-hidden">
-          <Calendar
+        {/* Full Screen Google-Style Calendar */}
+        <div className="flex-1 overflow-auto p-4">
+          <GoogleStyleCalendar
             events={events}
             onEventClick={handleEventClick}
             onDateClick={handleDateClick}
             onAddEvent={handleAddEvent}
+            onMonthChange={(date) => {
+              console.log('Month changed to:', date)
+              // You can add logic here to load events for the new month
+            }}
+            className="h-full"
+            showNavigation={true}
+            showTodayButton={true}
+            maxEventsPerDay={4}
+            loading={isLoading}
           />
         </div>
       </div>
