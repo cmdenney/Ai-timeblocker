@@ -212,26 +212,28 @@ export function GoogleStyleCalendar({
       )}
 
       {/* Calendar Grid Container */}
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col flex-1 min-h-0">
         {/* Week day headers */}
         <WeekDayHeaders />
 
         {/* Calendar days grid */}
-        <CalendarGrid
-          calendarDays={calendarDays}
-          monthStart={monthStart}
-          selectedDate={selectedDate}
-          hoveredDate={hoveredDate}
-          dayEvents={getEventsForDate}
-          maxEventsPerDay={maxEventsPerDay}
-          onDateClick={handleDateClick}
-          onAddEvent={handleAddEventClick}
-          onEventClick={handleEventClickInternal}
-          onEventEdit={handleEventEdit}
-          onEventDelete={handleEventDelete}
-          onEventDuplicate={handleEventDuplicate}
-          setHoveredDate={setHoveredDate}
-        />
+        <div className="flex-1 min-h-0">
+          <CalendarGrid
+            calendarDays={calendarDays}
+            monthStart={monthStart}
+            selectedDate={selectedDate}
+            hoveredDate={hoveredDate}
+            dayEvents={getEventsForDate}
+            maxEventsPerDay={maxEventsPerDay}
+            onDateClick={handleDateClick}
+            onAddEvent={handleAddEventClick}
+            onEventClick={handleEventClickInternal}
+            onEventEdit={handleEventEdit}
+            onEventDelete={handleEventDelete}
+            onEventDuplicate={handleEventDuplicate}
+            setHoveredDate={setHoveredDate}
+          />
+        </div>
       </div>
       
       {/* Event Modal */}

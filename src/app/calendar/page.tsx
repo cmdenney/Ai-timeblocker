@@ -268,32 +268,34 @@ export default function CalendarPage() {
         </div>
 
         {/* Full Screen Google-Style Calendar */}
-        <div className="flex-1 overflow-auto p-4">
-                <GoogleStyleCalendar
-                  events={events}
-                  onEventClick={handleEventClick}
-                  onDateClick={handleDateClick}
-                  onAddEvent={handleAddEvent}
-                  onMonthChange={(date) => {
-                    console.log('Month changed to:', date)
-                    // You can add logic here to load events for the new month
-                  }}
-                  onSearch={(query) => {
-                    console.log('Search query:', query)
-                    // TODO: Implement event search functionality
-                  }}
-                  user={{
-                    name: currentUser?.user_metadata?.full_name || currentUser?.email?.split('@')[0] || 'User',
-                    email: currentUser?.email || 'user@example.com',
-                    avatar: currentUser?.user_metadata?.avatar_url
-                  }}
-                  className="h-full"
-                  showNavigation={true}
-                  showTodayButton={true}
-                  maxEventsPerDay={4}
-                  loading={isLoading}
-                  showHeader={true}
-                />
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full p-4">
+            <GoogleStyleCalendar
+              events={events}
+              onEventClick={handleEventClick}
+              onDateClick={handleDateClick}
+              onAddEvent={handleAddEvent}
+              onMonthChange={(date) => {
+                console.log('Month changed to:', date)
+                // You can add logic here to load events for the new month
+              }}
+              onSearch={(query) => {
+                console.log('Search query:', query)
+                // TODO: Implement event search functionality
+              }}
+              user={{
+                name: currentUser?.user_metadata?.full_name || currentUser?.email?.split('@')[0] || 'User',
+                email: currentUser?.email || 'user@example.com',
+                avatar: currentUser?.user_metadata?.avatar_url
+              }}
+              className="h-full"
+              showNavigation={true}
+              showTodayButton={true}
+              maxEventsPerDay={4}
+              loading={isLoading}
+              showHeader={true}
+            />
+          </div>
         </div>
       </div>
     </MainLayout>

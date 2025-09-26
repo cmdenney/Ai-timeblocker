@@ -136,7 +136,7 @@ export function CalendarGrid({
   ])
 
   return (
-    <div className="flex-1 grid grid-cols-7 grid-rows-6">
+    <div className="h-full grid grid-cols-7 grid-rows-6 auto-rows-fr">
       {calendarDays.map((day, index) => renderCalendarCell(day, index))}
     </div>
   )
