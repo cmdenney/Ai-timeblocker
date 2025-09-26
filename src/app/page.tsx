@@ -7,7 +7,7 @@ import { AuthService } from '@/lib/supabase/auth'
 import { useEffect, useState } from 'react'
 
 export default function HomePage() {
-  // Trigger deployment
+  // Force new deployment with CSS fixes
   const router = useRouter()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)

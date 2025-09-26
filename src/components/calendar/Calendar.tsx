@@ -48,7 +48,7 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
       days.push(
         <div
           key={day.toString()}
-          className={`h-full p-2 border-r border-b border-border last:border-r-0 ${
+          className={`h-full p-2 border-r border-b border-gray-200 last:border-r-0 ${
             !isSameMonth(day, monthStart) ? 'bg-muted/30' : 'bg-background'
           } ${isSameDay(day, new Date()) ? 'bg-primary/10' : ''} ${
             selectedDate && isSameDay(day, selectedDate) ? 'bg-primary/20' : ''
@@ -119,7 +119,7 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
   return (
     <div className="h-full flex flex-col">
       {/* Calendar Header - Compact */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-background">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-background">
         <h2 className="text-lg font-semibold">
           {format(currentDate, 'MMMM yyyy')}
         </h2>
@@ -151,9 +151,9 @@ export function Calendar({ events = [], onEventClick, onDateClick, onAddEvent }:
       {/* Full Screen Calendar Grid */}
       <div className="flex-1 flex flex-col">
         {/* Week day headers */}
-        <div className="grid grid-cols-7 bg-muted/50 border-b border-border">
+        <div className="grid grid-cols-7 bg-muted/50 border-b border-gray-200">
           {weekDays.map((day) => (
-            <div key={day} className="p-3 text-center text-sm font-medium text-muted-foreground border-r border-border last:border-r-0">
+            <div key={day} className="p-3 text-center text-sm font-medium text-muted-foreground border-r border-gray-200 last:border-r-0">
               {day}
             </div>
           ))}

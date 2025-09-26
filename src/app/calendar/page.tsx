@@ -150,7 +150,7 @@ export default function CalendarPage() {
     <MainLayout user={currentUser}>
       <div className="h-full flex flex-col">
         {/* Top Controls - Compact */}
-        <div className="px-4 py-2 border-b border-border bg-background">
+        <div className="px-4 py-2 border-b border-gray-200 bg-background">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <h1 className="text-lg font-semibold flex items-center gap-2">

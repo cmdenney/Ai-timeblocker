@@ -42,7 +42,7 @@ export function MainLayout({ children, user }: MainLayoutProps) {
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Top Navigation Bar */}
-      <div className="h-16 border-b border-border bg-background flex items-center justify-between px-4">
+      <div className="h-16 border-b border-gray-200 bg-background flex items-center justify-between px-4">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -71,7 +71,7 @@ export function MainLayout({ children, user }: MainLayoutProps) {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Collapsible Sidebar */}
-        <div className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 border-r border-border bg-background overflow-hidden`}>
+        <div className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 border-r border-gray-200 bg-background overflow-hidden`}>
           <div className="h-full p-4 space-y-4">
             <nav className="space-y-2">
               <Button
@@ -121,7 +121,7 @@ export function MainLayout({ children, user }: MainLayoutProps) {
           
           {/* AI Chatbox */}
           {chatOpen && (
-            <div className="h-96 border-t border-border bg-background">
+            <div className="h-96 border-t border-gray-200 bg-background">
               <AIChatbox />
             </div>
           )}
@@ -215,7 +215,7 @@ function AIChatbox() {
   return (
     <div className="h-full flex flex-col">
       {/* Chat Header */}
-      <div className="p-4 border-b border-border">
+      <div className="p-4 border-b border-gray-200">
         <h3 className="font-semibold">AI Timeblocking Assistant</h3>
         <p className="text-sm text-muted-foreground">Describe your schedule and I&apos;ll create time blocks automatically</p>
       </div>
@@ -251,7 +251,7 @@ function AIChatbox() {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-border">
+      <div className="p-4 border-t border-gray-200">
         <div className="flex gap-2">
           <input
             type="text"
@@ -259,7 +259,7 @@ function AIChatbox() {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Describe what you need to schedule..."
-            className="flex-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="flex-1 px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             disabled={isLoading}
           />
           <Button 
